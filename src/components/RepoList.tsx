@@ -1,6 +1,6 @@
 import type { GithubRepo } from '../types/github';
 import { Star } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 interface RepoListProps {
   repos: GithubRepo[];

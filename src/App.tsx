@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { languages } from './config/languages';
 import { LanguageSection } from './components/LanguageSection';
 import { Github, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
