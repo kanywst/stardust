@@ -14,16 +14,24 @@ const queryClient = new QueryClient({
   },
 });
 
-// Floating Star Component
 const StarParticle = ({ delay, top, left }: { delay: number; top: string; left: string }) => (
   <motion.div
     className="absolute w-1 h-1 bg-white rounded-full"
     style={{ top, left }}
     initial={{ opacity: 0, scale: 0 }}
     animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
-    transition={{ duration: 3, repeat: Infinity, delay, ease: "easeInOut" }}
+    transition={{ duration: 3, repeat: Infinity, delay, ease: 'easeInOut' }}
   />
 );
+
+const STAR_PARTICLES = [
+  { top: '10%', left: '20%', delay: 0 },
+  { top: '30%', left: '80%', delay: 1 },
+  { top: '70%', left: '10%', delay: 2 },
+  { top: '50%', left: '50%', delay: 0.5 },
+  { top: '20%', left: '60%', delay: 1.5 },
+  { top: '80%', left: '90%', delay: 2.5 },
+];
 
 function App() {
   return (
@@ -39,12 +47,9 @@ function App() {
 
         {/* Floating Stars Layer */}
         <div className="fixed inset-0 pointer-events-none">
-          <StarParticle top="10%" left="20%" delay={0} />
-          <StarParticle top="30%" left="80%" delay={1} />
-          <StarParticle top="70%" left="10%" delay={2} />
-          <StarParticle top="50%" left="50%" delay={0.5} />
-          <StarParticle top="20%" left="60%" delay={1.5} />
-          <StarParticle top="80%" left="90%" delay={2.5} />
+          {STAR_PARTICLES.map((p) => (
+            <StarParticle key={`${p.top}-${p.left}`} {...p} />
+          ))}
         </div>
 
         {/* Header */}
@@ -119,7 +124,7 @@ function App() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {languages.map((lang, index) => (
               <motion.div
                 key={lang.name}
