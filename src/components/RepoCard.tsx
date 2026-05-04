@@ -1,4 +1,3 @@
-import React from 'react';
 import type { GithubRepo } from '../types/github';
 import { Star, GitFork, Crown, Trophy, Medal } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -9,7 +8,7 @@ interface RepoCardProps {
   rank: number;
 }
 
-export const RepoCard: React.FC<RepoCardProps> = ({ repo, rank }) => {
+export function RepoCard({ repo, rank }: RepoCardProps) {
   const getRankIcon = (r: number) => {
     switch (r) {
       case 1:
@@ -82,4 +81,4 @@ export const RepoCard: React.FC<RepoCardProps> = ({ repo, rank }) => {
       </div>
     </motion.a>
   );
-};
+}

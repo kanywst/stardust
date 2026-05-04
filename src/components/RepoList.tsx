@@ -1,4 +1,3 @@
-import React from 'react';
 import type { GithubRepo } from '../types/github';
 import { Star } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -8,7 +7,7 @@ interface RepoListProps {
   startRank: number;
 }
 
-export const RepoList: React.FC<RepoListProps> = ({ repos, startRank }) => {
+export function RepoList({ repos, startRank }: RepoListProps) {
   return (
     <div className="mt-4 flex flex-col gap-2">
       {repos.map((repo, index) => (
@@ -47,4 +46,4 @@ export const RepoList: React.FC<RepoListProps> = ({ repos, startRank }) => {
       ))}
     </div>
   );
-};
+}

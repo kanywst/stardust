@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import type { GithubRepo } from '../types/github';
 import { X, Star, ExternalLink, Loader2 } from 'lucide-react';
@@ -12,13 +12,7 @@ interface RepoModalProps {
   isLoading?: boolean;
 }
 
-export const RepoModal: React.FC<RepoModalProps> = ({
-  isOpen,
-  onClose,
-  language,
-  repos,
-  isLoading,
-}) => {
+export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoModalProps) {
   // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
@@ -129,4 +123,4 @@ export const RepoModal: React.FC<RepoModalProps> = ({
     </AnimatePresence>,
     document.body
   );
-};
+}
