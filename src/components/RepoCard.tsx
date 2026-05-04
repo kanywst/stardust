@@ -52,6 +52,8 @@ export const RepoCard: React.FC<RepoCardProps> = ({ repo, rank }) => {
         <img
           src={repo.owner.avatar_url}
           alt={repo.owner.login}
+          loading="lazy"
+          decoding="async"
           className="border-surfaceHighlight h-10 w-10 rounded-full border"
         />
         <div className="overflow-hidden">
