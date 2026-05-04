@@ -80,19 +80,8 @@ export const LanguageSection: React.FC<LanguageSectionProps> = ({ language }) =>
         ))}
       </div>
 
-      {next3.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <RepoList repos={next3} startRank={4} />
-          </div>
-        </div>
-      )}
+      {next3.length > 0 && <RepoList repos={next3} startRank={4} />}
 
-      {/* 
-        Pass "isLoading" to the modal so it can show a spinner if data isn't ready.
-        If fullData is not yet available, fallback to previewData (at least show top 6) or empty array.
-        Ideally, modal should handle loading state. 
-      */}
       <RepoModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
