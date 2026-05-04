@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { languages } from './config/languages';
 import { LanguageSection } from './components/LanguageSection';
@@ -16,7 +15,7 @@ const queryClient = new QueryClient({
 
 const StarParticle = ({ delay, top, left }: { delay: number; top: string; left: string }) => (
   <motion.div
-    className="absolute w-1 h-1 bg-white rounded-full"
+    className="absolute h-1 w-1 rounded-full bg-white"
     style={{ top, left }}
     initial={{ opacity: 0, scale: 0 }}
     animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
@@ -36,17 +35,19 @@ const STAR_PARTICLES = [
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-[#050505] text-text selection:bg-primary/30 overflow-hidden relative">
-        
+      <div className="text-text selection:bg-primary/30 relative min-h-screen overflow-hidden bg-[#050505]">
         {/* Background Nebula Effects */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-primary/20 rounded-full blur-[120px] opacity-30 animate-pulse" />
-          <div className="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-secondary/20 rounded-full blur-[120px] opacity-30 animate-pulse" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[30vw] h-[30vw] bg-accent/10 rounded-full blur-[100px] opacity-20" />
+        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+          <div className="bg-primary/20 absolute top-[-20%] left-[-10%] h-[50vw] w-[50vw] animate-pulse rounded-full opacity-30 blur-[120px]" />
+          <div
+            className="bg-secondary/20 absolute right-[-10%] bottom-[-20%] h-[50vw] w-[50vw] animate-pulse rounded-full opacity-30 blur-[120px]"
+            style={{ animationDelay: '2s' }}
+          />
+          <div className="bg-accent/10 absolute top-[40%] left-[50%] h-[30vw] w-[30vw] -translate-x-1/2 rounded-full opacity-20 blur-[100px]" />
         </div>
 
         {/* Floating Stars Layer */}
-        <div className="fixed inset-0 pointer-events-none">
+        <div className="pointer-events-none fixed inset-0">
           {STAR_PARTICLES.map((p) => (
             <StarParticle key={`${p.top}-${p.left}`} {...p} />
           ))}
@@ -54,23 +55,21 @@ function App() {
 
         {/* Header */}
         <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-black/50 backdrop-blur-xl">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="container mx-auto flex h-16 items-center justify-between px-4">
             <div className="flex items-center gap-3">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-md opacity-50 group-hover:opacity-100 transition-opacity" />
-                <div className="relative bg-black p-2 rounded-lg border border-white/10">
-                  <Github className="w-5 h-5 text-white" />
+              <div className="group relative">
+                <div className="from-primary to-accent absolute inset-0 bg-gradient-to-r opacity-50 blur-md transition-opacity group-hover:opacity-100" />
+                <div className="relative rounded-lg border border-white/10 bg-black p-2">
+                  <Github className="h-5 w-5 text-white" />
                 </div>
               </div>
-              <h1 className="text-xl font-bold tracking-tighter text-white">
-                Stardust
-              </h1>
+              <h1 className="text-xl font-bold tracking-tighter text-white">Stardust</h1>
             </div>
             <a
               href="https://github.com/kanywst/stardust"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-textMuted hover:text-white transition-colors"
+              className="text-textMuted text-sm font-medium transition-colors hover:text-white"
             >
               About
             </a>
@@ -78,53 +77,52 @@ function App() {
         </header>
 
         {/* Hero & Main Content */}
-        <main className="container mx-auto px-4 py-16 md:py-24 space-y-20 relative z-10">
-          
+        <main className="relative z-10 container mx-auto space-y-20 px-4 py-16 md:py-24">
           {/* Cinematic Hero */}
-          <div className="text-center max-w-4xl mx-auto space-y-8">
+          <div className="mx-auto max-w-4xl space-y-8 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               className="relative inline-block"
             >
-              <span className="absolute -inset-4 blur-2xl bg-gradient-to-r from-primary via-secondary to-accent opacity-30" />
-              <h2 className="relative text-5xl md:text-7xl font-black tracking-tight text-white drop-shadow-2xl">
+              <span className="from-primary via-secondary to-accent absolute -inset-4 bg-gradient-to-r opacity-30 blur-2xl" />
+              <h2 className="relative text-5xl font-black tracking-tight text-white drop-shadow-2xl md:text-7xl">
                 Explore the <br className="md:hidden" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-white to-cyan-200 animate-gradient-x pb-2">
+                <span className="animate-gradient-x bg-gradient-to-r from-indigo-200 via-white to-cyan-200 bg-clip-text pb-2 text-transparent">
                   Galaxies of Code
                 </span>
               </h2>
             </motion.div>
 
-            <motion.p 
-              className="text-lg md:text-xl text-textMuted max-w-2xl mx-auto leading-relaxed"
+            <motion.p
+              className="text-textMuted mx-auto max-w-2xl text-lg leading-relaxed md:text-xl"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              Navigating the brightest stars in the open-source universe. 
+              Navigating the brightest stars in the open-source universe.
               <br />
               <span className="text-white/80">Monitor the giants. Discover the legends.</span>
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.6 }}
-              className="flex justify-center gap-4 text-sm text-textMuted/60"
+              className="text-textMuted/60 flex justify-center gap-4 text-sm"
             >
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-yellow-500" />
+                <Sparkles className="h-4 w-4 text-yellow-500" />
                 <span>Live Data</span>
               </div>
-              <div className="w-px h-4 bg-white/10" />
+              <div className="h-4 w-px bg-white/10" />
               <div>2026 Edition</div>
             </motion.div>
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {languages.map((lang, index) => (
               <motion.div
                 key={lang.name}
@@ -140,7 +138,7 @@ function App() {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-white/5 mt-20 py-12 text-center relative z-10 bg-black/20 backdrop-blur-sm">
+        <footer className="relative z-10 mt-20 border-t border-white/5 bg-black/20 py-12 text-center backdrop-blur-sm">
           <p className="text-textMuted text-sm">
             © 2026 Stardust. Crafted by{' '}
             <a
@@ -154,7 +152,6 @@ function App() {
             .
           </p>
         </footer>
-        
       </div>
     </QueryClientProvider>
   );

@@ -12,8 +12,7 @@ interface RepoModalProps {
   isLoading?: boolean;
 }
 
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);

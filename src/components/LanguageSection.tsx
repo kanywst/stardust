@@ -39,8 +39,7 @@ export function LanguageSection({ language }: LanguageSectionProps) {
     queryFn: ({ signal }) => fetchTrendingRepos(language.query, 100, signal),
     staleTime: ONE_HOUR,
     enabled: isModalOpen,
-    placeholderData: (previous) =>
-      previous ?? queryClient.getQueryData<SearchResponse>(previewKey),
+    placeholderData: (previous) => previous ?? queryClient.getQueryData<SearchResponse>(previewKey),
   });
 
   const closeModal = () => {
@@ -67,7 +66,7 @@ export function LanguageSection({ language }: LanguageSectionProps) {
           type="button"
           onClick={() => refetchPreview()}
           disabled={isPreviewFetching}
-          className="border-red-400/40 text-red-200 hover:bg-red-500/20 disabled:opacity-50 inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 rounded-md border border-red-400/40 px-3 py-1.5 text-sm font-medium text-red-200 transition-colors hover:bg-red-500/20 disabled:opacity-50"
         >
           <RefreshCw className={`h-4 w-4 ${isPreviewFetching ? 'animate-spin' : ''}`} />
           Retry
