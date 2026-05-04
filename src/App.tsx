@@ -61,8 +61,10 @@ function App() {
                 Stardust
               </h1>
             </div>
-            <a 
-              href="https://github.com/kanywst/stardust" 
+            <a
+              href="https://github.com/kanywst/stardust"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm font-medium text-textMuted hover:text-white transition-colors"
             >
               About
