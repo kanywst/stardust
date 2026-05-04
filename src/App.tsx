@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { languages } from './config/languages';
 import { LanguageSection } from './components/LanguageSection';
-import { Github, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
+import { GithubMark } from './components/icons/GithubMark';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,7 +61,7 @@ function App() {
               <div className="group relative">
                 <div className="from-primary to-accent absolute inset-0 bg-gradient-to-r opacity-50 blur-md transition-opacity group-hover:opacity-100" />
                 <div className="relative rounded-lg border border-white/10 bg-black p-2">
-                  <Github className="h-5 w-5 text-white" />
+                  <GithubMark className="h-5 w-5 text-white" />
                 </div>
               </div>
               <h1 className="text-xl font-bold tracking-tighter text-white">Stardust</h1>
