@@ -28,6 +28,8 @@ export const RepoList: React.FC<RepoListProps> = ({ repos, startRank }) => {
           <img
             src={repo.owner.avatar_url}
             alt={repo.owner.login}
+            loading="lazy"
+            decoding="async"
             className="h-6 w-6 rounded-full"
           />
 

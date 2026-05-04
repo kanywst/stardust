@@ -96,6 +96,8 @@ export const RepoModal: React.FC<RepoModalProps> = ({
                   <img
                     src={repo.owner.avatar_url}
                     alt={repo.owner.login}
+                    loading="lazy"
+                    decoding="async"
                     className="border-surface group-hover:border-primary/50 h-14 w-14 rounded-full border-2 transition-colors"
                   />
 
