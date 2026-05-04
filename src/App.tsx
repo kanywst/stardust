@@ -142,7 +142,16 @@ function App() {
         {/* Footer */}
         <footer className="border-t border-white/5 mt-20 py-12 text-center relative z-10 bg-black/20 backdrop-blur-sm">
           <p className="text-textMuted text-sm">
-            © 2026 Stardust. Crafted by <a href="https://github.com/kanywst" className="text-white hover:underline">kanywst</a>.
+            © 2026 Stardust. Crafted by{' '}
+            <a
+              href="https://github.com/kanywst"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:underline"
+            >
+              kanywst
+            </a>
+            .
           </p>
         </footer>
         

@@ -50,10 +50,10 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
       <div className="mb-3 flex items-center gap-3">
         <img
           src={repo.owner.avatar_url}
-          alt={repo.owner.login}
+          alt=""
           width={40}
           height={40}
-          loading="lazy"
+          loading="eager"
           decoding="async"
           className="border-surfaceHighlight h-10 w-10 rounded-full border"
         />
