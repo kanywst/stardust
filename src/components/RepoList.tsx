@@ -27,6 +27,8 @@ export function RepoList({ repos, startRank }: RepoListProps) {
           <img
             src={repo.owner.avatar_url}
             alt={repo.owner.login}
+            width={24}
+            height={24}
             loading="lazy"
             decoding="async"
             className="h-6 w-6 rounded-full"

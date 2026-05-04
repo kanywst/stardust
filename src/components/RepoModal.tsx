@@ -90,6 +90,8 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
                   <img
                     src={repo.owner.avatar_url}
                     alt={repo.owner.login}
+                    width={56}
+                    height={56}
                     loading="lazy"
                     decoding="async"
                     className="border-surface group-hover:border-primary/50 h-14 w-14 rounded-full border-2 transition-colors"

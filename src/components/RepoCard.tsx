@@ -51,6 +51,8 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
         <img
           src={repo.owner.avatar_url}
           alt={repo.owner.login}
+          width={40}
+          height={40}
           loading="lazy"
           decoding="async"
           className="border-surfaceHighlight h-10 w-10 rounded-full border"
