@@ -1,6 +1,6 @@
 import type { GithubRepo } from '../types/github';
 import { Star, GitFork, Crown, Trophy, Medal } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import clsx from 'clsx';
 
 interface RepoCardProps {
