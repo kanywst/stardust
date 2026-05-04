@@ -134,7 +134,7 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
 
                   <img
                     src={repo.owner.avatar_url}
-                    alt={repo.owner.login}
+                    alt=""
                     width={56}
                     height={56}
                     loading="lazy"
