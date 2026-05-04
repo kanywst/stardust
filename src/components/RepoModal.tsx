@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { GithubRepo } from '../types/github';
 import { X, Star, ExternalLink, Loader2 } from 'lucide-react';
@@ -12,18 +12,53 @@ interface RepoModalProps {
   isLoading?: boolean;
 }
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoModalProps) {
-  // Prevent body scroll when open
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    if (!isOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = previous;
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const focusables = () => Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+    focusables()[0]?.focus();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   return createPortal(
     <AnimatePresence>
@@ -35,9 +70,14 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
+            aria-hidden="true"
           />
 
           <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             className="bg-surface border-surfaceHighlight relative flex h-[90vh] w-[95vw] max-w-none flex-col overflow-hidden rounded-3xl border shadow-2xl"
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -49,7 +89,10 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
               <div>
                 <div className="mb-2 flex items-center gap-4">
                   <span className="bg-primary block h-12 w-3 rounded-full" />
-                  <h2 className="text-text text-4xl font-black tracking-tight md:text-5xl">
+                  <h2
+                    id={titleId}
+                    className="text-text text-4xl font-black tracking-tight md:text-5xl"
+                  >
                     Top 100 {language}
                   </h2>
                 </div>
@@ -58,7 +101,9 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
                 </p>
               </div>
               <button
+                type="button"
                 onClick={onClose}
+                aria-label="Close dialog"
                 className="hover:bg-surfaceHighlight text-textMuted hover:text-text rounded-full p-4 transition-colors"
               >
                 <X className="h-8 w-8" />
