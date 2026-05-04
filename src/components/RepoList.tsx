@@ -18,7 +18,7 @@ export const RepoList: React.FC<RepoListProps> = ({ repos, startRank }) => {
           target="_blank"
           rel="noopener noreferrer"
           title={repo.name}
-          className="bg-surface/50 hover:border-surfaceHighlight hover:bg-surface flex items-center gap-3 rounded-lg border border-transparent p-3 transition-colors"
+          className="group bg-surface/50 hover:border-surfaceHighlight hover:bg-surface flex items-center gap-3 rounded-lg border border-transparent p-3 transition-colors"
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 + index * 0.05 }}
