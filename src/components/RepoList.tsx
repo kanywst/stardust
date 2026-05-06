@@ -1,6 +1,7 @@
 import type { GithubRepo } from '../types/github';
 import { Star } from 'lucide-react';
 import { motion } from 'motion/react';
+import { formatCompactStars } from '../lib/format';
 
 interface RepoListProps {
   repos: GithubRepo[];
@@ -42,7 +43,7 @@ export function RepoList({ repos, startRank }: RepoListProps) {
 
           <div className="text-textMuted flex items-center gap-1 text-xs">
             <Star className="h-3 w-3 text-yellow-500" />
-            <span>{(repo.stargazers_count / 1000).toFixed(1)}k</span>
+            <span>{formatCompactStars(repo.stargazers_count)}</span>
           </div>
         </motion.a>
       ))}
