@@ -1,17 +1,27 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { languages } from './config/languages';
 import { LanguageSection } from './components/LanguageSection';
 import { Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { GithubMark } from './components/icons/GithubMark';
 
+const ONE_DAY = 1000 * 60 * 60 * 24;
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
+      gcTime: ONE_DAY,
     },
   },
+});
+
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
+  key: 'stardust-query-cache',
 });
 
 const StarParticle = ({ delay, top, left }: { delay: number; top: string; left: string }) => (
@@ -35,7 +45,10 @@ const STAR_PARTICLES = [
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister, maxAge: ONE_DAY, buster: 'v1' }}
+    >
       <div className="text-text selection:bg-primary/30 relative min-h-screen overflow-hidden bg-[#050505]">
         {/* Background Nebula Effects */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -154,7 +167,7 @@ function App() {
           </p>
         </footer>
       </div>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
 
