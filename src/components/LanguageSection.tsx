@@ -107,15 +107,13 @@ export function LanguageSection({ language }: LanguageSectionProps) {
 
       {next3.length > 0 && <RepoList repos={next3} startRank={4} />}
 
-      {isModalOpen && (
-        <RepoModal
-          isOpen
-          onClose={closeModal}
-          language={language.name}
-          repos={fullData?.items ?? previewData.items}
-          isLoading={isFullLoading}
-        />
-      )}
+      <RepoModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        language={language.name}
+        repos={fullData?.items ?? previewData.items}
+        isLoading={isFullLoading}
+      />
     </div>
   );
 }
