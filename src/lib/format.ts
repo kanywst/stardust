@@ -1,5 +1,9 @@
+const COMPACT_FORMATTER = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+});
+
+// Intl emits "K" for thousands; the design uses lowercase k while keeping M.
 export function formatCompactStars(count: number): string {
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`;
-  return count.toString();
+  return COMPACT_FORMATTER.format(count).replace('K', 'k');
 }
