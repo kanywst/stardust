@@ -75,6 +75,23 @@ export function LanguageSection({ language }: LanguageSectionProps) {
     );
   }
 
+  if (previewData.items.length === 0) {
+    return (
+      <div className="border-surfaceHighlight/50 bg-surface/20 flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-8 text-center">
+        <h2
+          className="flex items-center gap-3 text-2xl font-black tracking-tight"
+          style={{ color: language.color }}
+        >
+          <span className="block h-8 w-3 rounded-full bg-current" />
+          {language.name}
+        </h2>
+        <p className="text-textMuted text-sm">
+          No repositories with more than 100 stars found yet. Check back as the ecosystem grows.
+        </p>
+      </div>
+    );
+  }
+
   const top3 = previewData.items.slice(0, 3);
   const next3 = previewData.items.slice(3, 6);
 
