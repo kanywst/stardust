@@ -111,7 +111,7 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
 
             {/* List */}
             <div className="custom-scrollbar relative space-y-3 overflow-y-auto p-6 md:p-10">
-              {isLoading && repos.length <= 6 ? (
+              {isLoading ? (
                 <div className="bg-surface/50 absolute inset-0 z-10 flex flex-col items-center justify-center backdrop-blur-sm">
                   <Loader2 className="text-primary mb-4 h-12 w-12 animate-spin" />
                   <p className="text-text text-xl font-bold">Accessing {language} Archives...</p>
