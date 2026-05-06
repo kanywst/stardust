@@ -5,7 +5,7 @@ Stardust provides a unified interface to monitor top-tier repositories across mu
 
 ![License](https://img.shields.io/github/license/kanywst/stardust?style=flat-square&color=000000)
 ![React](https://img.shields.io/badge/React-19-black?style=flat-square)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-black?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-black?style=flat-square)
 
 ![example](./assets/example.png)
 https://kanywst.github.io/stardust/
@@ -43,10 +43,10 @@ The interface prioritizes visual hierarchy. The top three repositories in any ca
 ## Architecture
 
 - **Runtime:** React 19
-- **Language:** TypeScript 5.9
-- **Build System:** Vite 7.2
+- **Language:** TypeScript 6.0
+- **Build System:** Vite 8
 - **Styling:** Tailwind CSS v4
-- **Motion:** Framer Motion
+- **Motion:** Motion (`motion/react`)
 
 ## Development
 
