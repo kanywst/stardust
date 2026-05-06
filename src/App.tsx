@@ -19,8 +19,16 @@ const queryClient = new QueryClient({
   },
 });
 
+const safeLocalStorage = (() => {
+  try {
+    return window.localStorage;
+  } catch {
+    return undefined;
+  }
+})();
+
 const persister = createSyncStoragePersister({
-  storage: window.localStorage,
+  storage: safeLocalStorage,
   key: 'stardust-query-cache',
 });
 
