@@ -9,9 +9,20 @@ beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-const IntersectionObserverMock = function () {
+// Reports every observed element as immediately intersecting so that
+// viewport-gated logic (e.g. `useInView`) activates synchronously in jsdom,
+// where there is no real layout/scrolling.
+const IntersectionObserverMock = function (
+  this: IntersectionObserver,
+  callback: IntersectionObserverCallback
+) {
   return {
-    observe: () => null,
+    observe: (element: Element) => {
+      callback(
+        [{ isIntersecting: true, target: element, intersectionRatio: 1 } as IntersectionObserverEntry],
+        this
+      );
+    },
     unobserve: () => null,
     disconnect: () => null,
     takeRecords: () => [],
