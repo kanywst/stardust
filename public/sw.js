@@ -23,17 +23,20 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Navigations: network-first so deploys are picked up, falling back to the
-  // cached shell when offline.
+  // Navigations: network-first so deploys are picked up. The successful shell
+  // is cached under a single key (the scope) so any offline route — even ones
+  // never visited online — falls back to it. Error responses are not cached.
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(self.registration.scope, copy));
+          }
           return response;
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match(self.registration.scope)))
+        .catch(() => caches.match(self.registration.scope))
     );
     return;
   }
