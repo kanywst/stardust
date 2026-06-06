@@ -119,63 +119,66 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
                 </div>
               ) : null}
 
-              {repos.map((repo, index) => (
-                <a
-                  key={repo.id}
-                  href={repo.html_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={repo.name}
-                  className="bg-background hover:bg-surfaceHighlight border-surfaceHighlight/50 group flex items-center gap-6 rounded-2xl border p-5 transition-all duration-200 hover:translate-x-2"
-                >
-                  <div className="text-textMuted/50 group-hover:text-primary w-12 flex-shrink-0 text-center text-xl font-bold transition-colors">
-                    #{index + 1}
-                  </div>
-
-                  <img
-                    src={repo.owner.avatar_url}
-                    alt=""
-                    width={56}
-                    height={56}
-                    loading="lazy"
-                    decoding="async"
-                    className="border-surface group-hover:border-primary/50 h-14 w-14 rounded-full border-2 transition-colors"
-                  />
-
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex items-center gap-3">
-                      <span className="text-textMuted text-sm font-medium">
-                        {repo.owner.login} /
-                      </span>
-                      <h3 className="text-text group-hover:text-primary truncate text-2xl font-bold transition-colors">
-                        {repo.name}
-                      </h3>
+              {repos.map((repo, index) => {
+                const relativeTime = formatRelativeTime(repo.pushed_at);
+                return (
+                  <a
+                    key={repo.id}
+                    href={repo.html_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={repo.name}
+                    className="bg-background hover:bg-surfaceHighlight border-surfaceHighlight/50 group flex items-center gap-6 rounded-2xl border p-5 transition-all duration-200 hover:translate-x-2"
+                  >
+                    <div className="text-textMuted/50 group-hover:text-primary w-12 flex-shrink-0 text-center text-xl font-bold transition-colors">
+                      #{index + 1}
                     </div>
-                    <p className="text-textMuted w-full truncate text-base">{repo.description}</p>
-                  </div>
 
-                  <div className="text-textMuted flex shrink-0 items-center gap-4 text-base font-medium">
-                    {formatRelativeTime(repo.pushed_at) && (
-                      <div
-                        className="hidden items-center gap-1.5 text-sm lg:flex"
-                        title={`Last pushed ${repo.pushed_at}`}
-                      >
-                        <History className="h-4 w-4" />
-                        <span>{formatRelativeTime(repo.pushed_at)}</span>
+                    <img
+                      src={repo.owner.avatar_url}
+                      alt=""
+                      width={56}
+                      height={56}
+                      loading="lazy"
+                      decoding="async"
+                      className="border-surface group-hover:border-primary/50 h-14 w-14 rounded-full border-2 transition-colors"
+                    />
+
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center gap-3">
+                        <span className="text-textMuted text-sm font-medium">
+                          {repo.owner.login} /
+                        </span>
+                        <h3 className="text-text group-hover:text-primary truncate text-2xl font-bold transition-colors">
+                          {repo.name}
+                        </h3>
                       </div>
-                    )}
-                    <div className="hidden items-center gap-1.5 text-sm sm:flex">
-                      <CircleDot className="h-4 w-4" />
-                      <span>{repo.open_issues_count.toLocaleString()}</span>
+                      <p className="text-textMuted w-full truncate text-base">{repo.description}</p>
                     </div>
-                    <div className="bg-surfaceHighlight/50 flex items-center gap-1.5 rounded-lg px-3 py-1.5">
-                      <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
-                      <span>{repo.stargazers_count.toLocaleString()}</span>
+
+                    <div className="text-textMuted flex shrink-0 items-center gap-4 text-base font-medium">
+                      {relativeTime && (
+                        <div
+                          className="hidden items-center gap-1.5 text-sm lg:flex"
+                          title={`Last pushed ${repo.pushed_at}`}
+                        >
+                          <History className="h-4 w-4" />
+                          <span>{relativeTime}</span>
+                        </div>
+                      )}
+                      <div className="hidden items-center gap-1.5 text-sm sm:flex">
+                        <CircleDot className="h-4 w-4" />
+                        <span>{repo.open_issues_count.toLocaleString()}</span>
+                      </div>
+                      <div className="bg-surfaceHighlight/50 flex items-center gap-1.5 rounded-lg px-3 py-1.5">
+                        <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
+                        <span>{repo.stargazers_count.toLocaleString()}</span>
+                      </div>
+                      <ExternalLink className="text-primary h-6 w-6 translate-x-[-10px] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
                     </div>
-                    <ExternalLink className="text-primary h-6 w-6 translate-x-[-10px] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
-                  </div>
-                </a>
-              ))}
+                  </a>
+                );
+              })}
             </div>
           </motion.div>
         </div>

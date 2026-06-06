@@ -28,7 +28,6 @@ export function formatRelativeTime(iso: string | undefined, now: Date = new Date
     [7, 'day'],
     [4.34524, 'week'],
     [12, 'month'],
-    [Number.POSITIVE_INFINITY, 'year'],
   ];
 
   let value = diffSeconds;
