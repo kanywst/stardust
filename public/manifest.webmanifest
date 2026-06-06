@@ -2,14 +2,14 @@
   "name": "Stardust",
   "short_name": "Stardust",
   "description": "Multi-language GitHub trending dashboard.",
-  "start_url": "/stardust/",
-  "scope": "/stardust/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#050505",
   "icons": [
     {
-      "src": "/stardust/icon.svg",
+      "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
