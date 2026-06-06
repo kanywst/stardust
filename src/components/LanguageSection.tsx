@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useInView } from 'motion/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Language } from '../config/languages';
 import { fetchTrendingRepos } from '../lib/github';
@@ -17,7 +18,13 @@ const ONE_HOUR = 1000 * 60 * 60;
 export function LanguageSection({ language }: LanguageSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+
+  // Only fetch a card's preview once it is about to enter the viewport. With 10+
+  // language cards, firing every preview eagerly on mount hits the unauthenticated
+  // Search API rate limit (~10 req/min) on first load.
+  const inView = useInView(sectionRef, { once: true, margin: '300px' });
 
   const previewKey = ['repos', language.query, 'preview'] as const;
   const fullKey = ['repos', language.query, 'full'] as const;
@@ -32,6 +39,7 @@ export function LanguageSection({ language }: LanguageSectionProps) {
     queryKey: previewKey,
     queryFn: ({ signal }) => fetchTrendingRepos(language.query, 6, signal),
     staleTime: ONE_HOUR,
+    enabled: inView,
   });
 
   const { data: fullData, isLoading: isFullLoading } = useQuery<SearchResponse>({
@@ -47,9 +55,12 @@ export function LanguageSection({ language }: LanguageSectionProps) {
     triggerRef.current?.focus();
   };
 
-  if (isPreviewLoading) {
+  if (!inView || isPreviewLoading) {
     return (
-      <div className="bg-surface/30 flex min-h-[400px] animate-pulse flex-col items-center justify-center rounded-2xl p-8">
+      <div
+        ref={sectionRef}
+        className="bg-surface/30 flex min-h-[400px] animate-pulse flex-col items-center justify-center rounded-2xl p-8"
+      >
         <Loader2 className="text-primary mb-4 h-8 w-8 animate-spin" />
         <p className="text-textMuted">Finding best {language.name} projects...</p>
       </div>
@@ -58,7 +69,10 @@ export function LanguageSection({ language }: LanguageSectionProps) {
 
   if (isPreviewError || !previewData) {
     return (
-      <div className="flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-2xl border border-red-500/20 bg-red-500/10 p-8">
+      <div
+        ref={sectionRef}
+        className="flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-2xl border border-red-500/20 bg-red-500/10 p-8"
+      >
         <p className="text-red-400">
           Failed to load {language.name} repositories. API rate limit might be exceeded.
         </p>
@@ -77,7 +91,10 @@ export function LanguageSection({ language }: LanguageSectionProps) {
 
   if (previewData.items.length === 0) {
     return (
-      <div className="border-surfaceHighlight/50 bg-surface/20 flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-8 text-center">
+      <div
+        ref={sectionRef}
+        className="border-surfaceHighlight/50 bg-surface/20 flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-8 text-center"
+      >
         <h2
           className="flex items-center gap-3 text-2xl font-black tracking-tight"
           style={{ color: language.color }}
@@ -96,7 +113,10 @@ export function LanguageSection({ language }: LanguageSectionProps) {
   const next3 = previewData.items.slice(3, 6);
 
   return (
-    <div className="bg-surface/30 border-surfaceHighlight/50 flex flex-col gap-6 rounded-3xl border p-6 backdrop-blur-sm">
+    <div
+      ref={sectionRef}
+      className="bg-surface/30 border-surfaceHighlight/50 flex flex-col gap-6 rounded-3xl border p-6 backdrop-blur-sm"
+    >
       <div className="flex items-center justify-between">
         <h2
           className="flex items-center gap-3 text-2xl font-black tracking-tight"

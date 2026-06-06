@@ -6,6 +6,7 @@ import { LanguageSection } from './components/LanguageSection';
 import { Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { GithubMark } from './components/icons/GithubMark';
+import { TokenSettings } from './components/TokenSettings';
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -87,14 +88,17 @@ function App() {
               </div>
               <h1 className="text-xl font-bold tracking-tighter text-white">Stardust</h1>
             </div>
-            <a
-              href="https://github.com/kanywst/stardust"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-textMuted text-sm font-medium transition-colors hover:text-white"
-            >
-              About
-            </a>
+            <div className="flex items-center gap-3">
+              <TokenSettings />
+              <a
+                href="https://github.com/kanywst/stardust"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-textMuted text-sm font-medium transition-colors hover:text-white"
+              >
+                About
+              </a>
+            </div>
           </div>
         </header>
 
