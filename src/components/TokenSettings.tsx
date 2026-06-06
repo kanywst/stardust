@@ -21,13 +21,22 @@ export function TokenSettings() {
         setOpen(false);
       }
     };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
     document.addEventListener('mousedown', onClickOutside);
-    return () => document.removeEventListener('mousedown', onClickOutside);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('keydown', onKeyDown);
+    };
   }, [open]);
 
   const save = () => {
     setStoredToken(value);
-    setHasToken(Boolean(value.trim()));
+    // Re-read from storage so the indicator reflects reality even if the write
+    // was a no-op (private mode, storage disabled).
+    setHasToken(Boolean(getStoredToken()));
     setValue('');
     setOpen(false);
     // Refetch everything so existing cards pick up the new auth ceiling.
@@ -37,7 +46,7 @@ export function TokenSettings() {
   const clear = () => {
     setStoredToken(null);
     setValue('');
-    setHasToken(false);
+    setHasToken(Boolean(getStoredToken()));
     queryClient.invalidateQueries({ queryKey: ['repos'] });
   };
 
@@ -69,7 +78,7 @@ export function TokenSettings() {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder={hasToken ? '•••••••• (saved)' : 'ghp_…'}
-            autoComplete="off"
+            autoComplete="new-password"
             className="bg-background border-surfaceHighlight text-text focus:border-primary w-full rounded-md border px-3 py-2 text-sm outline-none"
           />
           <div className="mt-3 flex items-center justify-between gap-2">
