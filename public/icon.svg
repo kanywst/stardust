@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Stardust">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6" />
+      <stop offset="0.5" stop-color="#8b5cf6" />
+      <stop offset="1" stop-color="#f472b6" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#050505" />
+  <rect width="512" height="512" rx="112" fill="url(#bg)" opacity="0.18" />
+  <path
+    fill="url(#bg)"
+    d="M256 96c12 70 50 108 120 120-70 12-108 50-120 120-12-70-50-108-120-120 70-12 108-50 120-120z"
+  />
+  <circle cx="150" cy="150" r="14" fill="#ffffff" opacity="0.9" />
+  <circle cx="380" cy="372" r="10" fill="#ffffff" opacity="0.8" />
+</svg>
