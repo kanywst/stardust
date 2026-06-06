@@ -1,6 +1,6 @@
 import type { GithubRepo } from '../types/github';
 import { Star, GitFork, Crown, Trophy, Medal, CircleDot, History } from 'lucide-react';
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import clsx from 'clsx';
 import { formatRelativeTime } from '../lib/format';
 
@@ -30,7 +30,7 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
     rank === 1 ? 'border-yellow-500/50' : rank === 2 ? 'border-gray-400/50' : 'border-amber-700/50';
 
   return (
-    <motion.a
+    <m.a
       href={repo.html_url}
       target="_blank"
       rel="noopener noreferrer"
@@ -111,6 +111,6 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
           </div>
         )}
       </div>
-    </motion.a>
+    </m.a>
   );
 }

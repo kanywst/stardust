@@ -2,7 +2,7 @@ import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { GithubRepo } from '../types/github';
 import { X, Star, ExternalLink, Loader2, CircleDot, History } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { formatRelativeTime } from '../lib/format';
 
 interface RepoModalProps {
@@ -64,7 +64,7 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-black/80 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -73,7 +73,7 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
             aria-hidden="true"
           />
 
-          <motion.div
+          <m.div
             ref={dialogRef}
             role="dialog"
             aria-modal="true"
@@ -180,7 +180,7 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
                 );
               })}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </AnimatePresence>,

@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useInView } from 'motion/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Language } from '../config/languages';
@@ -6,8 +7,48 @@ import { fetchTrendingRepos } from '../lib/github';
 import type { SearchResponse } from '../types/github';
 import { RepoCard } from './RepoCard';
 import { RepoList } from './RepoList';
-import { RepoModal } from './RepoModal';
 import { ArrowRight, Loader2, RefreshCw } from 'lucide-react';
+
+// Shown when the modal chunk can't be fetched (offline, or a stale hash after a
+// deploy). Gives the user actionable feedback instead of a dead button.
+const ModalLoadError = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
+  isOpen
+    ? createPortal(
+        <div
+          role="alertdialog"
+          aria-label="Failed to load"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+        >
+          <div className="absolute inset-0 bg-black/80" onClick={onClose} aria-hidden="true" />
+          <div className="bg-surface border-surfaceHighlight relative max-w-sm rounded-2xl border p-6 text-center">
+            <p className="text-text mb-4 text-sm">
+              Couldn’t load the Top 100 view. Please reload the page and try again.
+            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-primary rounded-md px-3 py-1.5 text-sm font-semibold text-white"
+            >
+              Close
+            </button>
+          </div>
+        </div>,
+        document.body
+      )
+    : null;
+
+// The Top-100 modal is only needed once the user opens it, so keep it out of the
+// initial bundle and load its chunk on first open. A failed chunk import is
+// logged (so it surfaces in monitoring) and degrades to ModalLoadError rather
+// than crashing the app with a ChunkLoadError.
+const RepoModal = lazy(() =>
+  import('./RepoModal')
+    .then((mod) => ({ default: mod.RepoModal }))
+    .catch((error) => {
+      console.error('Failed to load the Top-100 modal chunk', error);
+      return { default: ModalLoadError as unknown as typeof import('./RepoModal').RepoModal };
+    })
+);
 
 interface LanguageSectionProps {
   language: Language;
@@ -17,6 +58,7 @@ const ONE_HOUR = 1000 * 60 * 60;
 
 export function LanguageSection({ language }: LanguageSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [hasOpenedModal, setHasOpenedModal] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
@@ -138,7 +180,10 @@ export function LanguageSection({ language }: LanguageSectionProps) {
         <button
           ref={triggerRef}
           type="button"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setHasOpenedModal(true);
+            setIsModalOpen(true);
+          }}
           className="group text-textMuted flex items-center gap-2 text-sm font-medium transition-colors hover:text-white"
         >
           View Top 100
@@ -154,13 +199,24 @@ export function LanguageSection({ language }: LanguageSectionProps) {
 
       {next3.length > 0 && <RepoList repos={next3} startRank={4} />}
 
-      <RepoModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        language={language.name}
-        repos={fullData?.items ?? previewData.items}
-        isLoading={isFullLoading}
-      />
+      {hasOpenedModal && (
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+              <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+              <Loader2 className="text-primary relative z-10 h-12 w-12 animate-spin" />
+            </div>
+          }
+        >
+          <RepoModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            language={language.name}
+            repos={fullData?.items ?? previewData.items}
+            isLoading={isFullLoading}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
