@@ -6,6 +6,7 @@ import type { Language } from '../config/languages';
 import { fetchTrendingRepos, type RepoSort } from '../lib/github';
 import type { GithubRepo, SearchResponse } from '../types/github';
 import { timeRangeQualifier, type TimeRange } from '../lib/timeRange';
+import { useHashModal, slugify } from '../hooks/useHashModal';
 import { RepoCard } from './RepoCard';
 import { RepoList } from './RepoList';
 import { ArrowRight, Loader2, RefreshCw } from 'lucide-react';
@@ -77,7 +78,11 @@ export function LanguageSection({
   sort = 'stars',
   filter = '',
 }: LanguageSectionProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const {
+    isOpen: isModalOpen,
+    open: openModal,
+    close: closeHashModal,
+  } = useHashModal(slugify(language.name));
   const [hasOpenedModal, setHasOpenedModal] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -123,7 +128,7 @@ export function LanguageSection({
   });
 
   const closeModal = () => {
-    setIsModalOpen(false);
+    closeHashModal();
     triggerRef.current?.focus();
   };
 
@@ -276,7 +281,7 @@ export function LanguageSection({
           type="button"
           onClick={() => {
             setHasOpenedModal(true);
-            setIsModalOpen(true);
+            openModal();
           }}
           onMouseEnter={() => prefetchFull('hover')}
           onMouseLeave={() => cancelPrefetch('hover')}
@@ -305,7 +310,7 @@ export function LanguageSection({
         </>
       )}
 
-      {hasOpenedModal && (
+      {(hasOpenedModal || isModalOpen) && (
         <Suspense
           fallback={
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
