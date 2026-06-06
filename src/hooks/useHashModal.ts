@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const PREFIX = 'top100/';
 
@@ -11,15 +11,24 @@ export function slugify(value: string): string {
 
 function readHash(): string {
   if (typeof window === 'undefined') return '';
-  return decodeURIComponent(window.location.hash.replace(/^#/, ''));
+  const raw = window.location.hash.replace(/^#/, '');
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    // A malformed hash (stray % etc.) must not crash the app on mount/change.
+    return raw;
+  }
 }
 
 // Binds a modal's open state to the URL hash (#top100/<slug>) so the Top-100
-// view is deep-linkable and survives reloads. Closing strips the hash without
-// pushing a history entry.
+// view is deep-linkable and survives reloads. slugify already yields URL-safe
+// characters, so the hash is set directly (no encodeURIComponent, no %2F).
 export function useHashModal(slug: string) {
   const target = `${PREFIX}${slug}`;
   const [isOpen, setIsOpen] = useState(() => readHash() === target);
+  // Track whether this session opened the modal, so closing can pop the history
+  // entry it pushed instead of stranding the user behind a dead Back button.
+  const openedLocally = useRef(false);
 
   useEffect(() => {
     const sync = () => setIsOpen(readHash() === target);
@@ -29,11 +38,17 @@ export function useHashModal(slug: string) {
   }, [target]);
 
   const open = useCallback(() => {
-    window.location.hash = encodeURIComponent(target);
+    openedLocally.current = true;
+    window.location.hash = target;
   }, [target]);
 
   const close = useCallback(() => {
-    if (readHash() === target) {
+    if (readHash() !== target) return;
+    if (openedLocally.current) {
+      openedLocally.current = false;
+      window.history.back();
+    } else {
+      // Deep-linked directly to the modal: just strip the hash.
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
       setIsOpen(false);
     }
