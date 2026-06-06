@@ -37,9 +37,26 @@
   color-scheme: dark;
 }
 
+/* Decorative twinkling star field, driven entirely by CSS. */
+.animate-twinkle {
+  animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
 /* Respect users who ask for less motion: kill the looping nebula pulse,
-   gradient drift, and any incidental transitions/animations. The decorative
-   star field is suppressed in JS (see App.tsx). */
+   gradient drift, and any incidental transitions/animations, and freeze the
+   star field as static, dim dots. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -48,6 +65,11 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .animate-twinkle {
+    animation: none !important;
+    opacity: 0.4 !important;
+    transform: none !important;
   }
 }
 

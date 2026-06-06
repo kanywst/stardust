@@ -4,7 +4,7 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 import { languages } from './config/languages';
 import { LanguageSection } from './components/LanguageSection';
 import { Sparkles } from 'lucide-react';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
 import { GithubMark } from './components/icons/GithubMark';
 import { TokenSettings } from './components/TokenSettings';
 
@@ -33,27 +33,14 @@ const persister = createSyncStoragePersister({
   key: 'stardust-query-cache',
 });
 
-const StarParticle = ({ delay, top, left }: { delay: number; top: string; left: string }) => {
-  const reduceMotion = useReducedMotion();
-
-  // Render a static, dim dot instead of a forever-twinkling one when the user
-  // prefers reduced motion — this also drops a perpetual rAF/repaint loop.
-  if (reduceMotion) {
-    return (
-      <div className="absolute h-1 w-1 rounded-full bg-white opacity-40" style={{ top, left }} />
-    );
-  }
-
-  return (
-    <motion.div
-      className="absolute h-1 w-1 rounded-full bg-white"
-      style={{ top, left }}
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
-      transition={{ duration: 3, repeat: Infinity, delay, ease: 'easeInOut' }}
-    />
-  );
-};
+// Pure-CSS twinkle: no JS, no perpetual rAF loop, and the reduced-motion
+// preference is handled natively in index.css (.animate-twinkle override).
+const StarParticle = ({ delay, top, left }: { delay: number; top: string; left: string }) => (
+  <div
+    className="animate-twinkle absolute h-1 w-1 rounded-full bg-white"
+    style={{ top, left, animationDelay: `${delay}s` }}
+  />
+);
 
 const STAR_PARTICLES = [
   { top: '10%', left: '20%', delay: 0 },
@@ -73,12 +60,12 @@ function App() {
       <div className="text-text selection:bg-primary/30 relative min-h-screen overflow-hidden bg-[#050505]">
         {/* Background Nebula Effects */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="bg-primary/20 transform-gpu absolute top-[-20%] left-[-10%] h-[50vw] w-[50vw] animate-pulse rounded-full opacity-30 blur-[120px]" />
+          <div className="absolute top-[-20%] left-[-10%] h-[50vw] w-[50vw] animate-pulse bg-[radial-gradient(circle,var(--color-primary)_0%,transparent_70%)] opacity-10" />
           <div
-            className="bg-secondary/20 transform-gpu absolute right-[-10%] bottom-[-20%] h-[50vw] w-[50vw] animate-pulse rounded-full opacity-30 blur-[120px]"
+            className="absolute right-[-10%] bottom-[-20%] h-[50vw] w-[50vw] animate-pulse bg-[radial-gradient(circle,var(--color-secondary)_0%,transparent_70%)] opacity-10"
             style={{ animationDelay: '2s' }}
           />
-          <div className="bg-accent/10 transform-gpu absolute top-[40%] left-[50%] h-[30vw] w-[30vw] -translate-x-1/2 rounded-full opacity-20 blur-[100px]" />
+          <div className="absolute top-[40%] left-[50%] h-[30vw] w-[30vw] -translate-x-1/2 animate-pulse bg-[radial-gradient(circle,var(--color-accent)_0%,transparent_70%)] opacity-5" />
         </div>
 
         {/* Floating Stars Layer */}
