@@ -1,7 +1,8 @@
 import type { GithubRepo } from '../types/github';
-import { Star, GitFork, Crown, Trophy, Medal } from 'lucide-react';
+import { Star, GitFork, Crown, Trophy, Medal, CircleDot, History } from 'lucide-react';
 import { motion } from 'motion/react';
 import clsx from 'clsx';
+import { formatRelativeTime } from '../lib/format';
 
 interface RepoCardProps {
   repo: GithubRepo;
@@ -67,19 +68,44 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
         </div>
       </div>
 
-      <p className="text-textMuted mb-4 line-clamp-2 min-h-[40px] text-sm">
+      <p className="text-textMuted mb-3 line-clamp-2 min-h-[40px] text-sm">
         {repo.description || 'No description available.'}
       </p>
 
+      {repo.topics && repo.topics.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-1.5">
+          {repo.topics.slice(0, 3).map((topic) => (
+            <span
+              key={topic}
+              className="bg-surfaceHighlight text-textMuted rounded-full px-2 py-0.5 text-[10px] font-medium"
+            >
+              {topic}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div className="text-textMuted mt-auto flex items-center justify-between text-xs font-medium">
-        <div className="bg-surfaceHighlight flex items-center gap-1.5 rounded-md px-2 py-1">
-          <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
-          <span>{repo.stargazers_count.toLocaleString()}</span>
+        <div className="flex items-center gap-3">
+          <div className="bg-surfaceHighlight flex items-center gap-1.5 rounded-md px-2 py-1">
+            <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
+            <span>{repo.stargazers_count.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <GitFork className="h-3.5 w-3.5" />
+            <span>{repo.forks_count.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <CircleDot className="h-3.5 w-3.5" />
+            <span>{repo.open_issues_count.toLocaleString()}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <GitFork className="h-3.5 w-3.5" />
-          <span>{repo.forks_count.toLocaleString()}</span>
-        </div>
+        {formatRelativeTime(repo.pushed_at) && (
+          <div className="flex items-center gap-1" title={`Last pushed ${repo.pushed_at}`}>
+            <History className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{formatRelativeTime(repo.pushed_at)}</span>
+          </div>
+        )}
       </div>
     </motion.a>
   );
