@@ -11,12 +11,13 @@ const stubRepo = (id: number): GithubRepo => ({
   language: 'TypeScript',
   forks_count: 1000 + id,
   open_issues_count: 10,
+  pushed_at: '2026-06-01T00:00:00Z',
   owner: {
     login: `owner${id}`,
     avatar_url: `https://example.com/avatar/${id}.png`,
     html_url: `https://github.com/owner${id}`,
   },
-  topics: [],
+  topics: ['testing', 'mock'],
 });
 
 export const handlers = [

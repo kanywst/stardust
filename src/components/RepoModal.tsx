@@ -1,8 +1,9 @@
 import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { GithubRepo } from '../types/github';
-import { X, Star, ExternalLink, Loader2 } from 'lucide-react';
+import { X, Star, ExternalLink, Loader2, CircleDot, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { formatRelativeTime } from '../lib/format';
 
 interface RepoModalProps {
   isOpen: boolean;
@@ -153,7 +154,20 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
                     <p className="text-textMuted w-full truncate text-base">{repo.description}</p>
                   </div>
 
-                  <div className="text-textMuted flex shrink-0 items-center gap-6 text-base font-medium">
+                  <div className="text-textMuted flex shrink-0 items-center gap-4 text-base font-medium">
+                    {formatRelativeTime(repo.pushed_at) && (
+                      <div
+                        className="hidden items-center gap-1.5 text-sm lg:flex"
+                        title={`Last pushed ${repo.pushed_at}`}
+                      >
+                        <History className="h-4 w-4" />
+                        <span>{formatRelativeTime(repo.pushed_at)}</span>
+                      </div>
+                    )}
+                    <div className="hidden items-center gap-1.5 text-sm sm:flex">
+                      <CircleDot className="h-4 w-4" />
+                      <span>{repo.open_issues_count.toLocaleString()}</span>
+                    </div>
                     <div className="bg-surfaceHighlight/50 flex items-center gap-1.5 rounded-lg px-3 py-1.5">
                       <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
                       <span>{repo.stargazers_count.toLocaleString()}</span>
