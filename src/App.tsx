@@ -160,7 +160,7 @@ function App() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <LanguageSection language={lang} />
+                    <LanguageSection language={lang} priority={index === 0} />
                   </m.div>
                 ))}
               </div>

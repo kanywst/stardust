@@ -52,11 +52,14 @@ const RepoModal = lazy(() =>
 
 interface LanguageSectionProps {
   language: Language;
+  // Forwarded to the top cards' avatars so only the first (above-the-fold)
+  // section loads eagerly.
+  priority?: boolean;
 }
 
 const ONE_HOUR = 1000 * 60 * 60;
 
-export function LanguageSection({ language }: LanguageSectionProps) {
+export function LanguageSection({ language, priority = false }: LanguageSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasOpenedModal, setHasOpenedModal] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -240,7 +243,7 @@ export function LanguageSection({ language }: LanguageSectionProps) {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {top3.map((repo, i) => (
-          <RepoCard key={repo.id} repo={repo} rank={i + 1} />
+          <RepoCard key={repo.id} repo={repo} rank={i + 1} priority={priority} />
         ))}
       </div>
 
