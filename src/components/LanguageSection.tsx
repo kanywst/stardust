@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useInView } from 'motion/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -98,6 +98,49 @@ export function LanguageSection({ language }: LanguageSectionProps) {
     triggerRef.current?.focus();
   };
 
+  // Warm the full (top-100) query when the user signals intent by hovering or
+  // focusing the trigger. Debounced so a mouse sweeping across several cards
+  // doesn't fire a burst of requests into the strict Search API rate limit.
+  const prefetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Track the active intent sources so an overlapping hover+focus doesn't let
+  // one ending (e.g. mouse-leave) cancel a prefetch the other still wants.
+  const prefetchReasons = useRef(new Set<'hover' | 'focus'>());
+
+  const prefetchFull = (reason: 'hover' | 'focus') => {
+    prefetchReasons.current.add(reason);
+    if (prefetchTimeoutRef.current) return;
+    prefetchTimeoutRef.current = setTimeout(() => {
+      prefetchTimeoutRef.current = null;
+      queryClient.prefetchQuery({
+        queryKey: fullKey,
+        queryFn: ({ signal }) => fetchTrendingRepos(language.query, 100, signal),
+        staleTime: ONE_HOUR,
+      });
+    }, 150);
+  };
+
+  const cancelPrefetch = (reason: 'hover' | 'focus') => {
+    prefetchReasons.current.delete(reason);
+    if (prefetchReasons.current.size === 0 && prefetchTimeoutRef.current) {
+      clearTimeout(prefetchTimeoutRef.current);
+      prefetchTimeoutRef.current = null;
+    }
+  };
+
+  // Clear any pending prefetch timer on unmount, and also when the language
+  // changes — otherwise a debounced timer could fire with the previous
+  // language's query/key after the component is reused for a different language.
+  useEffect(() => {
+    const reasons = prefetchReasons.current;
+    return () => {
+      if (prefetchTimeoutRef.current) {
+        clearTimeout(prefetchTimeoutRef.current);
+        prefetchTimeoutRef.current = null;
+      }
+      reasons.clear();
+    };
+  }, [language.query]);
+
   // Before the card scrolls into view, render a completely static placeholder —
   // no animate-pulse/spin loops burning CPU/GPU on off-screen cards.
   if (!inView) {
@@ -184,6 +227,10 @@ export function LanguageSection({ language }: LanguageSectionProps) {
             setHasOpenedModal(true);
             setIsModalOpen(true);
           }}
+          onMouseEnter={() => prefetchFull('hover')}
+          onMouseLeave={() => cancelPrefetch('hover')}
+          onFocus={() => prefetchFull('focus')}
+          onBlur={() => cancelPrefetch('focus')}
           className="group text-textMuted flex items-center gap-2 text-sm font-medium transition-colors hover:text-white"
         >
           View Top 100
