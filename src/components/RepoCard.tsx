@@ -7,9 +7,12 @@ import { formatRelativeTime } from '../lib/format';
 interface RepoCardProps {
   repo: GithubRepo;
   rank: number;
+  // True only for cards expected above the fold on first paint, so we eagerly
+  // load just those avatars and lazy-load the rest.
+  priority?: boolean;
 }
 
-export function RepoCard({ repo, rank }: RepoCardProps) {
+export function RepoCard({ repo, rank, priority = false }: RepoCardProps) {
   const relativeTime = formatRelativeTime(repo.pushed_at);
   const getRankIcon = (r: number) => {
     switch (r) {
@@ -55,7 +58,8 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
           alt=""
           width={40}
           height={40}
-          loading="eager"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
           className="border-surfaceHighlight h-10 w-10 rounded-full border"
         />
