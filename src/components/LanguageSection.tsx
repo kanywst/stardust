@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Language } from '../config/languages';
 import { fetchTrendingRepos } from '../lib/github';
 import type { SearchResponse } from '../types/github';
+import { timeRangeQualifier, type TimeRange } from '../lib/timeRange';
 import { RepoCard } from './RepoCard';
 import { RepoList } from './RepoList';
 import { ArrowRight, Loader2, RefreshCw } from 'lucide-react';
@@ -55,11 +56,16 @@ interface LanguageSectionProps {
   // Forwarded to the top cards' avatars so only the first (above-the-fold)
   // section loads eagerly.
   priority?: boolean;
+  range?: TimeRange;
 }
 
 const ONE_HOUR = 1000 * 60 * 60;
 
-export function LanguageSection({ language, priority = false }: LanguageSectionProps) {
+export function LanguageSection({
+  language,
+  priority = false,
+  range = 'all',
+}: LanguageSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasOpenedModal, setHasOpenedModal] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -71,8 +77,12 @@ export function LanguageSection({ language, priority = false }: LanguageSectionP
   // Search API rate limit (~10 req/min) on first load.
   const inView = useInView(sectionRef, { once: true, margin: '300px' });
 
-  const previewKey = ['repos', language.query, 'preview'] as const;
-  const fullKey = ['repos', language.query, 'full'] as const;
+  // The time window narrows the search to recently-pushed repos. searchQuery
+  // carries a date-based pushed:> qualifier that rolls over daily, so include it
+  // in the keys too — otherwise the persisted cache would serve stale results.
+  const searchQuery = [language.query, timeRangeQualifier(range)].filter(Boolean).join(' ');
+  const previewKey = ['repos', language.query, range, searchQuery, 'preview'] as const;
+  const fullKey = ['repos', language.query, range, searchQuery, 'full'] as const;
 
   const {
     data: previewData,
@@ -83,17 +93,22 @@ export function LanguageSection({ language, priority = false }: LanguageSectionP
     isFetching: isPreviewFetching,
   } = useQuery({
     queryKey: previewKey,
-    queryFn: ({ signal }) => fetchTrendingRepos(language.query, 6, signal),
+    queryFn: ({ signal }) => fetchTrendingRepos(searchQuery, 6, signal),
     staleTime: ONE_HOUR,
     enabled: inView,
+    // Keep the current cards visible while a range switch refetches, instead of
+    // flashing every section back to its skeleton at once.
+    placeholderData: (previous) => previous,
   });
 
   const { data: fullData, isLoading: isFullLoading } = useQuery<SearchResponse>({
     queryKey: fullKey,
-    queryFn: ({ signal }) => fetchTrendingRepos(language.query, 100, signal),
+    queryFn: ({ signal }) => fetchTrendingRepos(searchQuery, 100, signal),
     staleTime: ONE_HOUR,
     enabled: isModalOpen,
-    placeholderData: (previous) => previous ?? queryClient.getQueryData<SearchResponse>(previewKey),
+    // Always seed from the current range's preview (not `previous`), so a range
+    // switch never flashes the prior range's 100 results into the modal.
+    placeholderData: () => queryClient.getQueryData<SearchResponse>(previewKey),
   });
 
   const closeModal = () => {

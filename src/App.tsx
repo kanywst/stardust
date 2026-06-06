@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { languages } from './config/languages';
 import { LanguageSection } from './components/LanguageSection';
+import { TimeRangeToggle } from './components/TimeRangeToggle';
+import type { TimeRange } from './lib/timeRange';
 import { Sparkles } from 'lucide-react';
 import { LazyMotion, MotionConfig, domAnimation, m } from 'motion/react';
 import { GithubMark } from './components/icons/GithubMark';
@@ -52,6 +55,8 @@ const STAR_PARTICLES = [
 ];
 
 function App() {
+  const [range, setRange] = useState<TimeRange>('all');
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
@@ -150,6 +155,11 @@ function App() {
                 </m.div>
               </div>
 
+              {/* Time-range filter */}
+              <div className="flex justify-center">
+                <TimeRangeToggle value={range} onChange={setRange} />
+              </div>
+
               {/* Grid */}
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                 {languages.map((lang, index) => (
@@ -160,7 +170,7 @@ function App() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <LanguageSection language={lang} priority={index < 2} />
+                    <LanguageSection language={lang} priority={index < 2} range={range} />
                   </m.div>
                 ))}
               </div>
