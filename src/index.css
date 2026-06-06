@@ -37,6 +37,20 @@
   color-scheme: dark;
 }
 
+/* Respect users who ask for less motion: kill the looping nebula pulse,
+   gradient drift, and any incidental transitions/animations. The decorative
+   star field is suppressed in JS (see App.tsx). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 body {
   @apply bg-background text-text antialiased;
   margin: 0;
