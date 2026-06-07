@@ -160,7 +160,7 @@ export function RepoModal({ isOpen, onClose, language, repos, isLoading }: RepoM
                       {relativeTime && (
                         <div
                           className="hidden items-center gap-1.5 text-sm lg:flex"
-                          title={`Last pushed ${repo.pushed_at}`}
+                          title={`Last pushed ${new Date(repo.pushed_at).toLocaleDateString()}`}
                         >
                           <History className="h-4 w-4" />
                           <span>{relativeTime}</span>

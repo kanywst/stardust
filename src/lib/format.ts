@@ -20,7 +20,9 @@ export function formatRelativeTime(iso: string | undefined, now: Date = new Date
   const ms = then.getTime();
   if (Number.isNaN(ms)) return '';
 
-  const diffSeconds = Math.round((ms - now.getTime()) / 1000);
+  // Clamp future timestamps (from local clock skew vs GitHub) to "now" rather
+  // than rendering awkward "in 5 seconds" strings.
+  const diffSeconds = Math.min(0, Math.round((ms - now.getTime()) / 1000));
   const divisions: [number, Intl.RelativeTimeFormatUnit][] = [
     [60, 'second'],
     [60, 'minute'],

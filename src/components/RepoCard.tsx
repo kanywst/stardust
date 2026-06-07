@@ -10,6 +10,7 @@ interface RepoCardProps {
 }
 
 export function RepoCard({ repo, rank }: RepoCardProps) {
+  const relativeTime = formatRelativeTime(repo.pushed_at);
   const getRankIcon = (r: number) => {
     switch (r) {
       case 1:
@@ -100,10 +101,13 @@ export function RepoCard({ repo, rank }: RepoCardProps) {
             <span>{repo.open_issues_count.toLocaleString()}</span>
           </div>
         </div>
-        {formatRelativeTime(repo.pushed_at) && (
-          <div className="flex items-center gap-1" title={`Last pushed ${repo.pushed_at}`}>
+        {relativeTime && (
+          <div
+            className="flex items-center gap-1"
+            title={`Last pushed ${new Date(repo.pushed_at).toLocaleDateString()}`}
+          >
             <History className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{formatRelativeTime(repo.pushed_at)}</span>
+            <span className="hidden sm:inline">{relativeTime}</span>
           </div>
         )}
       </div>
