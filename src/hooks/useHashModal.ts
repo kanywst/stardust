@@ -5,6 +5,10 @@ const PREFIX = 'top100/';
 export function slugify(value: string): string {
   return value
     .toLowerCase()
+    // Preserve language-distinguishing symbols before stripping, so C++ and C#
+    // don't both collapse to "c" and collide.
+    .replace(/\+/g, 'plus')
+    .replace(/#/g, 'sharp')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
@@ -56,8 +60,11 @@ export function useHashModal(slug: string) {
       openedLocally.current = false;
       window.history.back();
     } else {
-      // Deep-linked directly to the modal: just strip the hash.
+      // Deep-linked directly to the modal: just strip the hash. replaceState
+      // doesn't emit hashchange, so reset the guard here ourselves — otherwise
+      // it stays stuck and the modal could never be reopened.
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      closing.current = false;
       setIsOpen(false);
     }
   }, [target]);
