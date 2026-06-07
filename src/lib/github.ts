@@ -27,14 +27,19 @@ export function setStoredToken(token: string | null): void {
   }
 }
 
+// Maps to the GitHub Search API `sort` field. `updated` surfaces recently active
+// repos; the others rank by raw popularity.
+export type RepoSort = 'stars' | 'forks' | 'updated';
+
 export const fetchTrendingRepos = async (
   query: string,
   limit: number = 10,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  sort: RepoSort = 'stars'
 ): Promise<SearchResponse> => {
   const url = new URL(`${GITHUB_API_URL}/search/repositories`);
   url.searchParams.set('q', `${query} stars:>100`);
-  url.searchParams.set('sort', 'stars');
+  url.searchParams.set('sort', sort);
   url.searchParams.set('order', 'desc');
   url.searchParams.set('per_page', String(limit));
 
