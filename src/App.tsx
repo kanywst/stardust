@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { languages } from './config/languages';
 import { LanguageSection } from './components/LanguageSection';
+import { LanguageManager } from './components/LanguageManager';
+import { useManagedLanguages } from './hooks/useManagedLanguages';
 import { TimeRangeToggle } from './components/TimeRangeToggle';
 import type { TimeRange } from './lib/timeRange';
 import { DashboardControls } from './components/DashboardControls';
 import type { RepoSort } from './lib/github';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import { LazyMotion, MotionConfig, domAnimation, m } from 'motion/react';
 import { GithubMark } from './components/icons/GithubMark';
 import { TokenSettings } from './components/TokenSettings';
@@ -57,9 +58,12 @@ const STAR_PARTICLES = [
 ];
 
 function App() {
+  const { items, enabled, toggle, move, add, remove, reset } = useManagedLanguages();
   const [range, setRange] = useState<TimeRange>('all');
   const [sort, setSort] = useState<RepoSort>('stars');
   const [filter, setFilter] = useState('');
+  const [isManagerOpen, setIsManagerOpen] = useState(false);
+  const managerTriggerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <PersistQueryClientProvider
@@ -101,6 +105,15 @@ function App() {
                   <h1 className="text-xl font-bold tracking-tighter text-white">Stardust</h1>
                 </div>
                 <div className="flex items-center gap-3">
+                  <button
+                    ref={managerTriggerRef}
+                    type="button"
+                    onClick={() => setIsManagerOpen(true)}
+                    className="text-textMuted flex items-center gap-1.5 rounded-md border border-white/10 px-2.5 py-1.5 text-sm font-medium transition-colors hover:text-white"
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                    <span className="hidden sm:inline">Languages</span>
+                  </button>
                   <TokenSettings />
                   <a
                     href="https://github.com/kanywst/stardust"
@@ -113,6 +126,21 @@ function App() {
                 </div>
               </div>
             </header>
+
+            {isManagerOpen && (
+              <LanguageManager
+                items={items}
+                onToggle={toggle}
+                onMove={move}
+                onAdd={add}
+                onRemove={remove}
+                onReset={reset}
+                onClose={() => {
+                  setIsManagerOpen(false);
+                  managerTriggerRef.current?.focus();
+                }}
+              />
+            )}
 
             {/* Hero & Main Content */}
             <main className="relative z-10 container mx-auto space-y-20 px-4 py-16 md:py-24">
@@ -172,7 +200,7 @@ function App() {
 
               {/* Grid */}
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                {languages.map((lang, index) => (
+                {enabled.map((lang, index) => (
                   <m.div
                     key={lang.name}
                     initial={{ opacity: 0, y: 20 }}
@@ -190,6 +218,12 @@ function App() {
                   </m.div>
                 ))}
               </div>
+
+              {enabled.length === 0 && (
+                <p className="text-textMuted text-center text-sm">
+                  No languages selected. Use “Languages” in the header to enable some.
+                </p>
+              )}
             </main>
 
             {/* Footer */}
