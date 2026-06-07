@@ -33,6 +33,7 @@ export function LanguageSection({ language }: LanguageSectionProps) {
     data: previewData,
     isLoading: isPreviewLoading,
     isError: isPreviewError,
+    error: previewError,
     refetch: refetchPreview,
     isFetching: isPreviewFetching,
   } = useQuery({
@@ -74,13 +75,16 @@ export function LanguageSection({ language }: LanguageSectionProps) {
   }
 
   if (isPreviewError || !previewData) {
+    const isUnauthorized = previewError instanceof Error && previewError.message.includes('401');
     return (
       <div
         ref={sectionRef}
         className="flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-2xl border border-red-500/20 bg-red-500/10 p-8"
       >
         <p className="text-red-400">
-          Failed to load {language.name} repositories. API rate limit might be exceeded.
+          {isUnauthorized
+            ? `Failed to load ${language.name} repositories. Your GitHub token may be invalid or expired.`
+            : `Failed to load ${language.name} repositories. API rate limit might be exceeded.`}
         </p>
         <button
           type="button"
