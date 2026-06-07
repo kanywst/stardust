@@ -12,11 +12,13 @@ export default defineConfig({
         // Split big, rarely-changing vendor libraries into their own chunks so
         // an app-code change doesn't bust the whole cached bundle.
         manualChunks(id) {
-          if (!id.includes('node_modules')) return;
-          if (id.includes('react-dom') || id.includes('/react/') || id.includes('scheduler'))
+          // Normalize Windows backslashes so the path checks match on every OS.
+          const path = id.replace(/\\/g, '/');
+          if (!path.includes('node_modules')) return;
+          if (path.includes('react-dom') || path.includes('/react/') || path.includes('scheduler'))
             return 'react';
-          if (id.includes('motion') || id.includes('framer')) return 'motion';
-          if (id.includes('@tanstack')) return 'query';
+          if (path.includes('motion') || path.includes('framer')) return 'motion';
+          if (path.includes('@tanstack')) return 'query';
         },
       },
     },

@@ -85,22 +85,13 @@ export function LanguageSection({ language }: LanguageSectionProps) {
     enabled: inView,
   });
 
-  const {
-    data: fullData,
-    isLoading: isFullLoading,
-    isPlaceholderData,
-  } = useQuery<SearchResponse>({
+  const { data: fullData, isLoading: isFullLoading } = useQuery<SearchResponse>({
     queryKey: fullKey,
     queryFn: ({ signal }) => fetchTrendingRepos(language.query, 100, signal),
     staleTime: ONE_HOUR,
     enabled: isModalOpen,
     placeholderData: (previous) => previous ?? queryClient.getQueryData<SearchResponse>(previewKey),
   });
-
-  // placeholderData (seeded from the preview cache) flips the query to
-  // 'success' immediately, so isFullLoading never fires; isPlaceholderData is
-  // what tells us the real 100-row fetch is still in flight.
-  const isFullPending = isFullLoading || isPlaceholderData;
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -222,7 +213,7 @@ export function LanguageSection({ language }: LanguageSectionProps) {
             onClose={closeModal}
             language={language.name}
             repos={fullData?.items ?? previewData.items}
-            isLoading={isFullPending}
+            isLoading={isFullLoading}
           />
         </Suspense>
       )}
