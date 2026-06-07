@@ -36,4 +36,8 @@ describe('formatRelativeTime', () => {
     expect(formatRelativeTime('2026-06-04T12:00:00Z', now)).toBe('2 days ago');
     expect(formatRelativeTime('2026-05-06T12:00:00Z', now)).toBe('last month');
   });
+
+  it('clamps future timestamps (clock skew) to now', () => {
+    expect(formatRelativeTime('2026-06-06T13:00:00Z', now)).toBe('now');
+  });
 });
