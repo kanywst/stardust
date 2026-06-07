@@ -71,7 +71,13 @@ export function TokenSettings() {
       </button>
 
       {open && (
-        <div className="bg-surface border-surfaceHighlight absolute right-0 z-50 mt-2 w-80 rounded-xl border p-4 shadow-2xl">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (value.trim()) save();
+          }}
+          className="bg-surface border-surfaceHighlight absolute right-0 z-50 mt-2 w-80 rounded-xl border p-4 shadow-2xl"
+        >
           <label htmlFor={inputId} className="text-text text-sm font-semibold">
             GitHub token
           </label>
@@ -101,15 +107,14 @@ export function TokenSettings() {
               <span />
             )}
             <button
-              type="button"
-              onClick={save}
+              type="submit"
               disabled={!value.trim()}
               className="bg-primary rounded-md px-3 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
             >
               Save
             </button>
           </div>
-        </div>
+        </form>
       )}
     </div>
   );
