@@ -32,7 +32,10 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           if (response.ok) {
             const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(self.registration.scope, copy));
+            // waitUntil keeps the SW alive until the shell is actually stored.
+            event.waitUntil(
+              caches.open(CACHE).then((cache) => cache.put(self.registration.scope, copy))
+            );
           }
           return response;
         })
@@ -56,12 +59,17 @@ self.addEventListener('fetch', (event) => {
       const network = fetch(request).then((response) => {
         if (response.ok) {
           const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
+          return caches
+            .open(CACHE)
+            .then((cache) => cache.put(request, copy))
+            .then(() => response);
         }
         return response;
       });
       if (cached) {
-        network.catch(() => {}); // don't let a failed revalidation reject
+        // Revalidate in the background; waitUntil keeps the SW alive until the
+        // cache write finishes, and the catch stops a failed fetch rejecting.
+        event.waitUntil(network.catch(() => {}));
         return cached;
       }
       return network;
