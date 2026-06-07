@@ -29,9 +29,16 @@ export function useHashModal(slug: string) {
   // Track whether this session opened the modal, so closing can pop the history
   // entry it pushed instead of stranding the user behind a dead Back button.
   const openedLocally = useRef(false);
+  // Guards against a second close() (e.g. Escape + backdrop click in one tick)
+  // firing history.back() twice before the async hashchange lands.
+  const closing = useRef(false);
 
   useEffect(() => {
-    const sync = () => setIsOpen(readHash() === target);
+    const sync = () => {
+      const open = readHash() === target;
+      if (!open) closing.current = false;
+      setIsOpen(open);
+    };
     sync();
     window.addEventListener('hashchange', sync);
     return () => window.removeEventListener('hashchange', sync);
@@ -43,7 +50,8 @@ export function useHashModal(slug: string) {
   }, [target]);
 
   const close = useCallback(() => {
-    if (readHash() !== target) return;
+    if (closing.current || readHash() !== target) return;
+    closing.current = true;
     if (openedLocally.current) {
       openedLocally.current = false;
       window.history.back();
