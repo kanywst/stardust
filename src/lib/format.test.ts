@@ -34,7 +34,12 @@ describe('formatRelativeTime', () => {
   it('formats recent timestamps with the largest sensible unit', () => {
     expect(formatRelativeTime('2026-06-06T10:00:00Z', now)).toBe('2 hours ago');
     expect(formatRelativeTime('2026-06-04T12:00:00Z', now)).toBe('2 days ago');
-    expect(formatRelativeTime('2026-05-06T12:00:00Z', now)).toBe('last month');
+    expect(formatRelativeTime('2026-05-06T12:00:00Z', now)).toBe('4 weeks ago');
+  });
+
+  it('promotes near-boundary values to the next unit', () => {
+    // 59.6 minutes ago should read as an hour, not "60 minutes ago".
+    expect(formatRelativeTime('2026-06-06T11:00:24Z', now)).toBe('1 hour ago');
   });
 
   it('clamps future timestamps (clock skew) to now', () => {
