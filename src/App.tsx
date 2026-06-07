@@ -63,12 +63,12 @@ function App() {
         <div className="text-text selection:bg-primary/30 relative min-h-screen overflow-hidden bg-[#050505]">
           {/* Background Nebula Effects */}
           <div className="pointer-events-none fixed inset-0 overflow-hidden">
-            <div className="absolute top-[-20%] left-[-10%] h-[50vw] w-[50vw] animate-pulse bg-[radial-gradient(circle,var(--color-primary)_0%,transparent_70%)] opacity-10" />
+            <div className="transform-gpu absolute top-[-20%] left-[-10%] h-[50vw] w-[50vw] animate-pulse bg-[radial-gradient(circle,var(--color-primary)_0%,transparent_70%)] opacity-10" />
             <div
-              className="absolute right-[-10%] bottom-[-20%] h-[50vw] w-[50vw] animate-pulse bg-[radial-gradient(circle,var(--color-secondary)_0%,transparent_70%)] opacity-10"
+              className="transform-gpu absolute right-[-10%] bottom-[-20%] h-[50vw] w-[50vw] animate-pulse bg-[radial-gradient(circle,var(--color-secondary)_0%,transparent_70%)] opacity-10"
               style={{ animationDelay: '2s' }}
             />
-            <div className="absolute top-[40%] left-[50%] h-[30vw] w-[30vw] -translate-x-1/2 animate-pulse bg-[radial-gradient(circle,var(--color-accent)_0%,transparent_70%)] opacity-5" />
+            <div className="transform-gpu absolute top-[40%] left-[50%] h-[30vw] w-[30vw] -translate-x-1/2 animate-pulse bg-[radial-gradient(circle,var(--color-accent)_0%,transparent_70%)] opacity-5" />
           </div>
 
           {/* Floating Stars Layer */}
