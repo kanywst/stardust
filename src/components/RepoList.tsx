@@ -5,10 +5,14 @@ import { formatCompactStars } from '../lib/format';
 
 interface RepoListProps {
   repos: GithubRepo[];
-  startRank: number;
+  // True rank for each repo (parallel to `repos`), so filtered lists keep their
+  // original numbering instead of renumbering from the visible slice. Falls back
+  // to sequential numbering from `startRank` when omitted.
+  ranks?: number[];
+  startRank?: number;
 }
 
-export function RepoList({ repos, startRank }: RepoListProps) {
+export function RepoList({ repos, ranks, startRank = 1 }: RepoListProps) {
   return (
     <div className="mt-4 flex flex-col gap-2">
       {repos.map((repo, index) => (
@@ -23,7 +27,9 @@ export function RepoList({ repos, startRank }: RepoListProps) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 + index * 0.05 }}
         >
-          <span className="text-textMuted w-4 text-sm font-bold">{startRank + index}.</span>
+          <span className="text-textMuted w-4 text-sm font-bold">
+            {ranks?.[index] ?? startRank + index}.
+          </span>
 
           <img
             src={repo.owner.avatar_url}

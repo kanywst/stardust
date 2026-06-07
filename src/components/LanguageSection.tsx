@@ -1,10 +1,10 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useInView } from 'motion/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Language } from '../config/languages';
-import { fetchTrendingRepos } from '../lib/github';
-import type { SearchResponse } from '../types/github';
+import { fetchTrendingRepos, type RepoSort } from '../lib/github';
+import type { GithubRepo, SearchResponse } from '../types/github';
 import { timeRangeQualifier, type TimeRange } from '../lib/timeRange';
 import { RepoCard } from './RepoCard';
 import { RepoList } from './RepoList';
@@ -57,14 +57,25 @@ interface LanguageSectionProps {
   // section loads eagerly.
   priority?: boolean;
   range?: TimeRange;
+  sort?: RepoSort;
+  filter?: string;
 }
 
 const ONE_HOUR = 1000 * 60 * 60;
+
+const matchesFilter = (repo: GithubRepo, needle: string) => {
+  if (!needle) return true;
+  const haystack =
+    `${repo.full_name || ''} ${repo.name || ''} ${repo.owner?.login || ''}`.toLowerCase();
+  return haystack.includes(needle);
+};
 
 export function LanguageSection({
   language,
   priority = false,
   range = 'all',
+  sort = 'stars',
+  filter = '',
 }: LanguageSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasOpenedModal, setHasOpenedModal] = useState(false);
@@ -78,11 +89,11 @@ export function LanguageSection({
   const inView = useInView(sectionRef, { once: true, margin: '300px' });
 
   // The time window narrows the search to recently-pushed repos. searchQuery
-  // carries a date-based pushed:> qualifier that rolls over daily, so include it
-  // in the keys too — otherwise the persisted cache would serve stale results.
+  // carries a date-based pushed:> qualifier that rolls over daily; include it
+  // and sort in the keys so the persisted cache partitions correctly.
   const searchQuery = [language.query, timeRangeQualifier(range)].filter(Boolean).join(' ');
-  const previewKey = ['repos', language.query, range, searchQuery, 'preview'] as const;
-  const fullKey = ['repos', language.query, range, searchQuery, 'full'] as const;
+  const previewKey = ['repos', language.query, range, sort, searchQuery, 'preview'] as const;
+  const fullKey = ['repos', language.query, range, sort, searchQuery, 'full'] as const;
 
   const {
     data: previewData,
@@ -93,17 +104,17 @@ export function LanguageSection({
     isFetching: isPreviewFetching,
   } = useQuery({
     queryKey: previewKey,
-    queryFn: ({ signal }) => fetchTrendingRepos(searchQuery, 6, signal),
+    queryFn: ({ signal }) => fetchTrendingRepos(searchQuery, 6, signal, sort),
     staleTime: ONE_HOUR,
     enabled: inView,
-    // Keep the current cards visible while a range switch refetches, instead of
-    // flashing every section back to its skeleton at once.
+    // Keep the current cards visible while a range/sort switch refetches,
+    // instead of flashing every section back to its skeleton at once.
     placeholderData: (previous) => previous,
   });
 
   const { data: fullData, isLoading: isFullLoading } = useQuery<SearchResponse>({
     queryKey: fullKey,
-    queryFn: ({ signal }) => fetchTrendingRepos(searchQuery, 100, signal),
+    queryFn: ({ signal }) => fetchTrendingRepos(searchQuery, 100, signal, sort),
     staleTime: ONE_HOUR,
     enabled: isModalOpen,
     // Always seed from the current range's preview (not `previous`), so a range
@@ -131,7 +142,7 @@ export function LanguageSection({
       prefetchTimeoutRef.current = null;
       queryClient.prefetchQuery({
         queryKey: fullKey,
-        queryFn: ({ signal }) => fetchTrendingRepos(language.query, 100, signal),
+        queryFn: ({ signal }) => fetchTrendingRepos(searchQuery, 100, signal, sort),
         staleTime: ONE_HOUR,
       });
     }, 150);
@@ -158,6 +169,31 @@ export function LanguageSection({
       reasons.clear();
     };
   }, [language.query]);
+
+  const needle = filter.trim().toLowerCase();
+
+  // Memoize the filter/rank work (a Map build + array filters over up to 100
+  // items) so it only reruns when the data, sort, or filter actually changes.
+  const { rankByRepoId, filteredPreview } = useMemo(() => {
+    const items = previewData?.items ?? [];
+    // Preserve each repo's true rank from the unfiltered list so filtering never
+    // re-ranks (e.g. promoting #4 to a #1 crown).
+    const rankMap = new Map(items.map((repo, i) => [repo.id, i + 1]));
+    return {
+      rankByRepoId: rankMap,
+      filteredPreview: items.filter((repo) => matchesFilter(repo, needle)),
+    };
+  }, [previewData, needle]);
+
+  const modalRepos = useMemo(
+    () =>
+      (fullData?.items ?? previewData?.items ?? []).filter((repo) => matchesFilter(repo, needle)),
+    [fullData, previewData, needle]
+  );
+
+  const rankOf = (repo: GithubRepo) => rankByRepoId.get(repo.id) ?? 0;
+  const top3 = filteredPreview.slice(0, 3);
+  const next3 = filteredPreview.slice(3, 6);
 
   // Before the card scrolls into view, render a completely static placeholder —
   // no animate-pulse/spin loops burning CPU/GPU on off-screen cards.
@@ -222,9 +258,6 @@ export function LanguageSection({
     );
   }
 
-  const top3 = previewData.items.slice(0, 3);
-  const next3 = previewData.items.slice(3, 6);
-
   return (
     <div
       ref={sectionRef}
@@ -256,13 +289,21 @@ export function LanguageSection({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {top3.map((repo, i) => (
-          <RepoCard key={repo.id} repo={repo} rank={i + 1} priority={priority} />
-        ))}
-      </div>
+      {filteredPreview.length === 0 ? (
+        <p className="text-textMuted py-6 text-center text-sm">
+          No matches for “{filter.trim()}” in {language.name}.
+        </p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {top3.map((repo) => (
+              <RepoCard key={repo.id} repo={repo} rank={rankOf(repo)} priority={priority} />
+            ))}
+          </div>
 
-      {next3.length > 0 && <RepoList repos={next3} startRank={4} />}
+          {next3.length > 0 && <RepoList repos={next3} ranks={next3.map(rankOf)} />}
+        </>
+      )}
 
       {hasOpenedModal && (
         <Suspense
@@ -277,7 +318,7 @@ export function LanguageSection({
             isOpen={isModalOpen}
             onClose={closeModal}
             language={language.name}
-            repos={fullData?.items ?? previewData.items}
+            repos={modalRepos}
             isLoading={isFullLoading}
           />
         </Suspense>

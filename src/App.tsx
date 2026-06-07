@@ -6,6 +6,8 @@ import { languages } from './config/languages';
 import { LanguageSection } from './components/LanguageSection';
 import { TimeRangeToggle } from './components/TimeRangeToggle';
 import type { TimeRange } from './lib/timeRange';
+import { DashboardControls } from './components/DashboardControls';
+import type { RepoSort } from './lib/github';
 import { Sparkles } from 'lucide-react';
 import { LazyMotion, MotionConfig, domAnimation, m } from 'motion/react';
 import { GithubMark } from './components/icons/GithubMark';
@@ -56,6 +58,8 @@ const STAR_PARTICLES = [
 
 function App() {
   const [range, setRange] = useState<TimeRange>('all');
+  const [sort, setSort] = useState<RepoSort>('stars');
+  const [filter, setFilter] = useState('');
 
   return (
     <PersistQueryClientProvider
@@ -155,9 +159,15 @@ function App() {
                 </m.div>
               </div>
 
-              {/* Time-range filter */}
-              <div className="flex justify-center">
+              {/* Time-range filter + sort/filter controls */}
+              <div className="flex flex-col items-center gap-4">
                 <TimeRangeToggle value={range} onChange={setRange} />
+                <DashboardControls
+                  sort={sort}
+                  onSortChange={setSort}
+                  filter={filter}
+                  onFilterChange={setFilter}
+                />
               </div>
 
               {/* Grid */}
@@ -170,7 +180,13 @@ function App() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <LanguageSection language={lang} priority={index < 2} range={range} />
+                    <LanguageSection
+                      language={lang}
+                      priority={index < 2}
+                      range={range}
+                      sort={sort}
+                      filter={filter}
+                    />
                   </m.div>
                 ))}
               </div>
