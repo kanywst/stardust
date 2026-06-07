@@ -34,7 +34,10 @@ export function formatRelativeTime(iso: string | undefined, now: Date = new Date
 
   let value = diffSeconds;
   for (const [amount, unit] of divisions) {
-    if (Math.abs(value) < amount) {
+    // Compare the rounded value against the threshold so a near-boundary value
+    // promotes to the next unit (e.g. 59.6 min → "an hour ago", not "60 minutes
+    // ago") rather than rounding only after the unit is chosen.
+    if (Math.abs(Math.round(value)) < amount) {
       return RELATIVE_FORMATTER.format(Math.round(value), unit);
     }
     value /= amount;
