@@ -36,24 +36,35 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => caches.match(self.registration.scope))
+        .catch(async () => {
+          // Offline: fall back to the cached shell. If nothing is cached yet,
+          // throw so the browser shows its standard offline page instead of
+          // crashing on an undefined respondWith.
+          const cached = await caches.match(self.registration.scope);
+          if (cached) return cached;
+          throw new Error('offline and no cached shell');
+        })
     );
     return;
   }
 
-  // Static assets: stale-while-revalidate.
+  // Static assets: stale-while-revalidate. Serve the cached copy immediately
+  // (revalidating in the background) or wait on the network — never resolve
+  // respondWith with undefined.
   event.respondWith(
     caches.match(request).then((cached) => {
-      const network = fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || network;
+      const network = fetch(request).then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      });
+      if (cached) {
+        network.catch(() => {}); // don't let a failed revalidation reject
+        return cached;
+      }
+      return network;
     })
   );
 });
