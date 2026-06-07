@@ -14,15 +14,22 @@ export function TokenSettings() {
   const panelRef = useRef<HTMLDivElement>(null);
   const inputId = useId();
 
+  // Closing always discards any unsaved input so a stale token isn't shown on
+  // reopen.
+  const closePanel = () => {
+    setOpen(false);
+    setValue('');
+  };
+
   useEffect(() => {
     if (!open) return;
     const onClickOutside = (e: MouseEvent) => {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        setOpen(false);
+        closePanel();
       }
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') closePanel();
     };
     document.addEventListener('mousedown', onClickOutside);
     document.addEventListener('keydown', onKeyDown);
@@ -54,7 +61,7 @@ export function TokenSettings() {
     <div ref={panelRef} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? closePanel() : setOpen(true))}
         aria-expanded={open}
         aria-label="GitHub token settings"
         className="text-textMuted flex items-center gap-1.5 rounded-md border border-white/10 px-2.5 py-1.5 text-sm font-medium transition-colors hover:text-white"

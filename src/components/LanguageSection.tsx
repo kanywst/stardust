@@ -55,7 +55,13 @@ export function LanguageSection({ language }: LanguageSectionProps) {
     triggerRef.current?.focus();
   };
 
-  if (!inView || isPreviewLoading) {
+  // Before the card scrolls into view, render a completely static placeholder —
+  // no animate-pulse/spin loops burning CPU/GPU on off-screen cards.
+  if (!inView) {
+    return <div ref={sectionRef} className="bg-surface/30 min-h-[400px] rounded-2xl" />;
+  }
+
+  if (isPreviewLoading) {
     return (
       <div
         ref={sectionRef}
